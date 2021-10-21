@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center"
+    android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="टेक्स्ट गाइड में आपका स्वागत ह"
+            android:textSize="50sp"
+            android:padding="12dp"
+            android:shadowColor="#11209F"
+            android:shadowDx="12"
+            android:shadowDy="12"
+            android:shadowRadius="8"
+            android:textStyle="bold"
+            android:id="@+id/welcometext"
+            />
+
+
+        <TextView
+            android:id="@+id/selecttext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="उपयुक्त भाषा चुनें"
+            android:textSize="32sp"
+            android:textColor="#11209F"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="32dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:id="@+id/buttonhindi"
+            android:gravity="center"
+            android:text="हिंदी" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:id="@+id/buttonmarathi"
+            android:gravity="center"
+            android:text="मराठी" />
+    </LinearLayout>
+
