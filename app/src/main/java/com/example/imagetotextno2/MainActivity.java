@@ -9,7 +9,7 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button buttonmarathi, buttonhindi;
+    Button buttonmarathi, buttonhindi, testButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
         buttonhindi = findViewById(R.id.buttonhindi);
         buttonmarathi = findViewById(R.id.buttonmarathi);
+        testButton = findViewById(R.id.testButton);
 
 
         buttonhindi.setOnClickListener(new View.OnClickListener() {
@@ -30,6 +31,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), MainActivityMarathi.class));
+            }
+        });
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ExampleActivity.class));
             }
         });
     }

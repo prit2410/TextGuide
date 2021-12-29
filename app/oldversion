@@ -39,25 +39,27 @@ public class MainActivityMarathi extends AppCompatActivity {
     Button mCaptureBtn;
     Button selectimage;
     ImageView mImageView;
-    TextView resultTv;
+    TextView imageDetails;
     private static final int PERMISSION_CODE = 1000;
-    private static final int IMAGE_CAPTURE_CODE = 1001;
-    private static final int PICK_IMAGE = 100;
+    private static final int IMAGE_CAPTURE_CODE = 1000;
+    private static final int PICK_IMAGE = 1001;
+    private static final int REQUEST_GET_SINGLE_FILE = 1;
 
     private static final int CAMERA_REQUEST_CODE = 1;
     Uri image_uri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_hindi);
+
+        setContentView(R.layout.activity_main_marathi);
 
         mCaptureBtn  = findViewById(R.id.captureimage);
         detecttext = findViewById(R.id.detecttext);
         mImageView = findViewById(R.id.imageView);
-        resultTv = findViewById(R.id.imageDetails);
+        imageDetails = findViewById(R.id.imageDetails);
         selectimage = findViewById(R.id.selectimage);
 
-        resultTv.setVisibility(TextView.INVISIBLE);
+        imageDetails.setVisibility(TextView.INVISIBLE);
 
 
         mCaptureBtn.setOnClickListener(new View.OnClickListener() {
@@ -130,7 +132,7 @@ public class MainActivityMarathi extends AppCompatActivity {
                     openCamera();
                 } else {
                     //permission from popup was denied
-                    Toast.makeText(this, "परवानगी नाकारली...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Permission denied...", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -142,41 +144,57 @@ public class MainActivityMarathi extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //called when image was captured from camera
+
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
+            //set the image captured to our ImageView
             image_uri = data.getData();
-            mImageView.setImageURI(image_uri);
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), image_uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mImageView.setImageBitmap(bitmap);
         }
     }
 
 
     private void DetectTextFromImage() throws IOException {
-        FirebaseVisionImage image;
-        try {
-            image = FirebaseVisionImage.fromFilePath(getApplicationContext(),image_uri);
-            FirebaseVisionTextRecognizer textRecognizer = FirebaseVision.getInstance()
-                    .getOnDeviceTextRecognizer();
+        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), image_uri);
+        FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
+        FirebaseVisionTextRecognizer textRecognizer =
+                FirebaseVision.getInstance().getOnDeviceTextRecognizer();
 
-            textRecognizer.processImage(image)
-                    .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
-                        @Override
-                        public void onSuccess(FirebaseVisionText result) {
-                            resultTv.setVisibility(TextView.VISIBLE);
-                            resultTv.setText(result.getText());
-                            resultTv.setMovementMethod(new ScrollingMovementMethod());
-
-                        }
-                    })
-                    .addOnFailureListener(
-                            new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(MainActivityMarathi.this, "प्रतिमेमध्ये कोणताही मजकूर आढळला नाहीा", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        textRecognizer.processImage(image).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+            @Override
+            public void onSuccess(@NonNull @org.jetbrains.annotations.NotNull FirebaseVisionText firebaseVisionText) {
+                displayTextFromImage(firebaseVisionText);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull @NotNull Exception e) {
+                Toast.makeText(MainActivityMarathi.this, "Error:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.d("Error:",e.getMessage());
+            }
+        });
     }
 
+
+
+    private void displayTextFromImage(FirebaseVisionText firebaseVisionText) {
+        List<FirebaseVisionText.TextBlock> blockList =firebaseVisionText.getTextBlocks();
+        if(blockList.size() == 0){
+            Toast.makeText(this, "छवि में कोई पाठ नहीं मिला", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            for(FirebaseVisionText.TextBlock block: firebaseVisionText.getTextBlocks()){
+                String Text = block.getText();
+                imageDetails.setVisibility(TextView.VISIBLE);
+                imageDetails.setText(Text);
+                imageDetails.setMovementMethod(new ScrollingMovementMethod());
+            }
+        }
+    }
 }

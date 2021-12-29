@@ -3,6 +3,7 @@ package com.example.imagetotextno2;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -46,13 +47,14 @@ import java.util.List;
 
 
 public class MainActivityHindi extends AppCompatActivity {
-
     Button detecttext;
     Button mCaptureBtn;
+    Button selectimage;
     ImageView mImageView;
-    TextView imageDetails;
+    TextView resultTv;
     private static final int PERMISSION_CODE = 1000;
     private static final int IMAGE_CAPTURE_CODE = 1001;
+    private static final int PICK_IMAGE = 100;
 
     private static final int CAMERA_REQUEST_CODE = 1;
     Uri image_uri;
@@ -64,7 +66,10 @@ public class MainActivityHindi extends AppCompatActivity {
         mCaptureBtn  = findViewById(R.id.captureimage);
         detecttext = findViewById(R.id.detecttext);
         mImageView = findViewById(R.id.imageView);
-        imageDetails = findViewById(R.id.imageDetails);
+        resultTv = findViewById(R.id.imageDetails);
+        selectimage = findViewById(R.id.selectimage);
+
+        resultTv.setVisibility(TextView.INVISIBLE);
 
 
         mCaptureBtn.setOnClickListener(new View.OnClickListener() {
@@ -93,6 +98,15 @@ public class MainActivityHindi extends AppCompatActivity {
             }
         });
 
+        selectimage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openGallery();
+            }
+        });
+
+
+
         detecttext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -115,6 +129,7 @@ public class MainActivityHindi extends AppCompatActivity {
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, image_uri);
         startActivityForResult(cameraIntent, IMAGE_CAPTURE_CODE);
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         //this method is called, when user presses Allow or Deny from Permission Request Popup
@@ -127,55 +142,53 @@ public class MainActivityHindi extends AppCompatActivity {
                     openCamera();
                 } else {
                     //permission from popup was denied
-                    Toast.makeText(this, "Permission denied...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "अनुमति नहीं मिली...", Toast.LENGTH_SHORT).show();
                 }
             }
         }
     }
+    private void openGallery() {
+        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        startActivityForResult(gallery, PICK_IMAGE);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //called when image was captured from camera
-
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            //set the image captured to our ImageView
+        if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
+            image_uri = data.getData();
             mImageView.setImageURI(image_uri);
         }
     }
+
+
     private void DetectTextFromImage() throws IOException {
-        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), image_uri);
-        FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
-        FirebaseVisionTextRecognizer textRecognizer =
-                FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+        FirebaseVisionImage image;
+        try {
+            image = FirebaseVisionImage.fromFilePath(getApplicationContext(),image_uri);
+            FirebaseVisionTextRecognizer textRecognizer = FirebaseVision.getInstance()
+                    .getOnDeviceTextRecognizer();
 
-        textRecognizer.processImage(image).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
-            @Override
-            public void onSuccess(@NonNull @org.jetbrains.annotations.NotNull FirebaseVisionText firebaseVisionText) {
-                displayTextFromImage(firebaseVisionText);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull @NotNull Exception e) {
-                Toast.makeText(MainActivityHindi.this, "Error:" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d("Error:",e.getMessage());
-            }
-        });
-    }
+            textRecognizer.processImage(image)
+                    .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+                        @Override
+                        public void onSuccess(FirebaseVisionText result) {
+                            resultTv.setVisibility(TextView.VISIBLE);
+                            resultTv.setText(result.getText());
+                            resultTv.setMovementMethod(new ScrollingMovementMethod());
 
-
-
-    private void displayTextFromImage(FirebaseVisionText firebaseVisionText) {
-        List<FirebaseVisionText.TextBlock> blockList =firebaseVisionText.getTextBlocks();
-        if(blockList.size() == 0){
-            Toast.makeText(this, "छवि में कोई पाठ नहीं मिला", Toast.LENGTH_SHORT).show();
-        }
-        else{
-            for(FirebaseVisionText.TextBlock block: firebaseVisionText.getTextBlocks()){
-                String Text = block.getText();
-                imageDetails.setText(Text);
-            }
+                        }
+                    })
+                    .addOnFailureListener(
+                            new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(MainActivityHindi.this, "छवि में कोई पाठ नहीं मिला", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
 }
-

@@ -4,34 +4,54 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     tools:context=".MainActivityHindi">
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="353dp"
+        android:layout_height="250dp"
         tools:srcCompat="@tools:sample/avatars" />
+
 
     <Button
         android:id="@+id/captureimage"
         android:layout_width="290dp"
         android:layout_height="58dp"
         android:layout_alignBottom="@id/imageView"
-        android:layout_marginBottom="-229dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginBottom="-307dp"
         android:text="छवि कैप्चर करें" />
+
+    <Button
+        android:id="@+id/selectimage"
+        android:layout_width="289dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/captureimage"
+        android:layout_marginBottom="-76dp"
+        android:layout_marginLeft="60dp"
+        android:text="गैलरी से छवि का चयन करेंा"/>
 
     <Button
         android:id="@+id/detecttext"
         android:layout_width="289dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/captureimage"
+        android:layout_alignBottom="@id/selectimage"
+        android:layout_marginLeft="60dp"
         android:layout_marginBottom="-76dp"
         android:text="टेक्स्ट का पता लगाएं" />
 
     <TextView
         android:id="@+id/imageDetails"
         android:layout_width="match_parent"
-        android:layout_height="115dp"
+        android:layout_height="200dp"
         android:layout_below="@id/imageView"
-        android:layout_marginTop="5dp"
-        android:text="" />
+        android:layout_marginTop="6dp"
+        android:text=""
+        android:background="@color/white"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textColor="@color/black"
+        android:scrollbars = "vertical"
+        android:textSize="15dp"
+        android:justificationMode="inter_word"/>
 </RelativeLayout>

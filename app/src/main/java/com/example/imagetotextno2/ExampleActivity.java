@@ -30,11 +30,10 @@ import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-public class MainActivityMarathi extends AppCompatActivity {
+public class ExampleActivity extends AppCompatActivity {
     Button detecttext;
     Button mCaptureBtn;
     Button selectimage;
@@ -130,7 +129,7 @@ public class MainActivityMarathi extends AppCompatActivity {
                     openCamera();
                 } else {
                     //permission from popup was denied
-                    Toast.makeText(this, "परवानगी नाकारली...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "अनुमति नहीं मिली...", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -142,8 +141,11 @@ public class MainActivityMarathi extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //called when image was captured from camera
+
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
+            //set the image captured to our ImageView
             image_uri = data.getData();
             mImageView.setImageURI(image_uri);
         }
@@ -161,6 +163,8 @@ public class MainActivityMarathi extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
                         @Override
                         public void onSuccess(FirebaseVisionText result) {
+                            // Task completed successfully
+                            // ...
                             resultTv.setVisibility(TextView.VISIBLE);
                             resultTv.setText(result.getText());
                             resultTv.setMovementMethod(new ScrollingMovementMethod());
@@ -171,7 +175,7 @@ public class MainActivityMarathi extends AppCompatActivity {
                             new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(MainActivityMarathi.this, "प्रतिमेमध्ये कोणताही मजकूर आढळला नाहीा", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ExampleActivity.this, "छवि में कोई पाठ नहीं मिला", Toast.LENGTH_SHORT).show();
                                 }
                             });
         } catch (IOException e) {
@@ -180,3 +184,4 @@ public class MainActivityMarathi extends AppCompatActivity {
     }
 
 }
+
